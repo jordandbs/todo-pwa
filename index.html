@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#0f0f14" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="TÃ¢ches" />
-  <meta name="description" content="Ma liste de tÃ¢ches personnelle" />
-  <title>TÃ¢ches</title>
+  <meta name="apple-mobile-web-app-title" content="Tâches" />
+  <meta name="description" content="Ma liste de tâches personnelle" />
+  <title>Tâches</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,11 +22,11 @@
   <div id="widget-view" class="hidden">
     <div class="widget-card">
       <div class="widget-header">
-        <span class="widget-title">TÃ¢ches</span>
+        <span class="widget-title">Tâches</span>
         <span id="widget-count" class="widget-count">0</span>
       </div>
       <ul id="widget-list" class="widget-list"></ul>
-      <button class="widget-open-btn" onclick="switchView('app')">Ouvrir â</button>
+      <button class="widget-open-btn" onclick="switchView('app')">Ouvrir →</button>
     </div>
   </div>
 
@@ -36,7 +36,7 @@
       <div class="header-top">
         <div>
           <p class="header-date" id="header-date"></p>
-          <h1 class="header-title">Mes tÃ¢ches</h1>
+          <h1 class="header-title">Mes tâches</h1>
         </div>
         <div class="header-actions">
           <button class="icon-btn" onclick="switchView('widget')" title="Mode widget">
@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat-pill"><span id="stat-total">0</span> tÃ¢ches</div>
+        <div class="stat-pill"><span id="stat-total">0</span> tâches</div>
         <div class="stat-pill done-pill"><span id="stat-done">0</span> faites</div>
         <div class="stat-pill pending-pill"><span id="stat-pending">0</span> restantes</div>
       </div>
@@ -53,21 +53,21 @@
 
     <div class="filter-tabs">
       <button class="tab active" data-filter="all" onclick="setFilter('all', this)">Toutes</button>
-      <button class="tab" data-filter="pending" onclick="setFilter('pending', this)">Ã faire</button>
+      <button class="tab" data-filter="pending" onclick="setFilter('pending', this)">À faire</button>
       <button class="tab" data-filter="done" onclick="setFilter('done', this)">Faites</button>
-      <button class="tab" data-filter="recurring" onclick="setFilter('recurring', this)">ð RÃ©currentes</button>
+      <button class="tab" data-filter="recurring" onclick="setFilter('recurring', this)">🔁 Récurrentes</button>
     </div>
 
     <main class="task-container">
       <ul id="task-list" class="task-list"></ul>
       <div id="empty-state" class="empty-state hidden">
-        <div class="empty-icon">â¦</div>
-        <p>Aucune tÃ¢che ici</p>
+        <div class="empty-icon">✦</div>
+        <p>Aucune tâche ici</p>
         <span>Appuie sur + pour en ajouter une</span>
       </div>
     </main>
 
-    <button class="fab" onclick="openModal()" aria-label="Ajouter une tÃ¢che">
+    <button class="fab" onclick="openModal()" aria-label="Ajouter une tâche">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
@@ -76,22 +76,22 @@
   <div id="modal-overlay" class="modal-overlay hidden" onclick="handleOverlayClick(event)">
     <div class="modal" id="modal">
       <div class="modal-handle"></div>
-      <h2 class="modal-title" id="modal-title">Nouvelle tÃ¢che</h2>
+      <h2 class="modal-title" id="modal-title">Nouvelle tâche</h2>
 
       <div class="form-group">
         <label for="input-title">Titre <span class="required">*</span></label>
-        <input type="text" id="input-title" placeholder="Ex: Appeler le mÃ©decinâ¦" maxlength="60" autocomplete="off" />
+        <input type="text" id="input-title" placeholder="Ex: Appeler le médecin…" maxlength="60" autocomplete="off" />
         <span class="char-count" id="title-count">0/60</span>
       </div>
 
       <div class="form-group">
         <label for="input-desc">Description</label>
-        <textarea id="input-desc" placeholder="DÃ©tails, notes, contexteâ¦" rows="3" maxlength="200"></textarea>
+        <textarea id="input-desc" placeholder="Détails, notes, contexte…" rows="3" maxlength="200"></textarea>
         <span class="char-count" id="desc-count">0/200</span>
       </div>
 
       <div class="form-group">
-        <label>PrioritÃ©</label>
+        <label>Priorité</label>
         <div class="priority-selector">
           <button class="prio-btn active" data-prio="normal" onclick="selectPrio('normal', this)">
             <span class="prio-dot normal"></span> Normale
@@ -105,17 +105,17 @@
         </div>
       </div>
 
-      <!-- RÃCURRENCE -->
+      <!-- RÉCURRENCE -->
       <div class="form-group">
         <div class="recurrence-header">
-          <label>RÃ©currence</label>
+          <label>Récurrence</label>
           <button class="toggle-recurrence" id="toggle-recurrence" onclick="toggleRecurrence()">
-            <span id="recurrence-toggle-label">DÃ©sactivÃ©e</span>
+            <span id="recurrence-toggle-label">Désactivée</span>
             <div class="toggle-switch" id="toggle-switch"></div>
           </button>
         </div>
         <div id="recurrence-panel" class="recurrence-panel hidden">
-          <p class="recurrence-hint">Jours oÃ¹ la tÃ¢che rÃ©apparaÃ®t :</p>
+          <p class="recurrence-hint">Jours où la tâche réapparaît :</p>
           <div class="days-selector">
             <button class="day-btn" data-day="1" onclick="toggleDay(1, this)">Lun</button>
             <button class="day-btn" data-day="2" onclick="toggleDay(2, this)">Mar</button>
@@ -127,7 +127,7 @@
           </div>
           <div class="quick-days">
             <button class="quick-btn" onclick="selectQuickDays('week')">Tous les jours</button>
-            <button class="quick-btn" onclick="selectQuickDays('workdays')">LunâVen</button>
+            <button class="quick-btn" onclick="selectQuickDays('workdays')">Lun–Ven</button>
             <button class="quick-btn" onclick="selectQuickDays('weekend')">Week-end</button>
           </div>
         </div>
@@ -140,25 +140,25 @@
     </div>
   </div>
 
-  <!-- POPUP SUPPRESSION RÃCURRENCE -->
+  <!-- POPUP SUPPRESSION RÉCURRENCE -->
   <div id="delete-popup-overlay" class="delete-popup-overlay hidden" onclick="closeDeletePopup()">
     <div class="delete-popup" onclick="event.stopPropagation()">
-      <div class="delete-popup-icon">ð</div>
-      <h3 class="delete-popup-title">TÃ¢che rÃ©currente</h3>
-      <p class="delete-popup-desc">Cette tÃ¢che est programmÃ©e pour rÃ©apparaÃ®tre automatiquement.</p>
+      <div class="delete-popup-icon">🔁</div>
+      <h3 class="delete-popup-title">Tâche récurrente</h3>
+      <p class="delete-popup-desc">Cette tâche est programmée pour réapparaître automatiquement.</p>
       <div class="delete-popup-actions">
         <button class="dp-btn dp-keep" onclick="deleteOccurrenceOnly()">
-          <span class="dp-btn-icon">â</span>
+          <span class="dp-btn-icon">✕</span>
           <div class="dp-btn-text">
             <strong>Supprimer aujourd'hui seulement</strong>
-            <small>Elle reviendra au prochain jour prÃ©vu</small>
+            <small>Elle reviendra au prochain jour prévu</small>
           </div>
         </button>
         <button class="dp-btn dp-forever" onclick="deleteForever()">
-          <span class="dp-btn-icon">ð</span>
+          <span class="dp-btn-icon">🗑</span>
           <div class="dp-btn-text">
-            <strong>Supprimer la rÃ©currence</strong>
-            <small>Effacer dÃ©finitivement pour toujours</small>
+            <strong>Supprimer la récurrence</strong>
+            <small>Effacer définitivement pour toujours</small>
           </div>
         </button>
       </div>
