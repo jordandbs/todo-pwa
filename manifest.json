@@ -1,7 +1,7 @@
 {
-  "name": "Mes TÃ¢ches",
-  "short_name": "TÃ¢ches",
-  "description": "Liste de tÃ¢ches personnelle avec widget",
+  "name": "Mes Tâches",
+  "short_name": "Tâches",
+  "description": "Liste de tâches personnelle avec widget",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f0f14",
@@ -26,9 +26,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Nouvelle tÃ¢che",
+      "name": "Nouvelle tâche",
       "short_name": "Ajouter",
-      "description": "Ajouter une nouvelle tÃ¢che",
+      "description": "Ajouter une nouvelle tâche",
       "url": "./index.html?action=add",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
