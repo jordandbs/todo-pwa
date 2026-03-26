@@ -539,7 +539,7 @@ body {
 .prio-dot.urgent { background: var(--urgent); }
 
 /* ===========================
-   RÃCURRENCE
+   RÉCURRENCE
 =========================== */
 .recurrence-header {
   display: flex;
