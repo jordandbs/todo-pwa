@@ -1,14 +1,14 @@
 /* ===========================
-   TODO PWA â app.js v2
+   TODO PWA — app.js v2
    - CRUD complet
-   - CochÃ© = barrÃ© (pas supprimÃ© immÃ©diatement)
-   - Ã minuit : suppression auto des tÃ¢ches cochÃ©es non-rÃ©currentes
-   - RÃ©currence par jours de la semaine
-     â tÃ¢che rÃ©currente cochÃ©e : rÃ©apparaÃ®t le prochain jour prÃ©vu
-     â suppression rÃ©currente : popup â "aujourd'hui seulement" OU "pour toujours"
+   - Coché = barré (pas supprimé immédiatement)
+   - À minuit : suppression auto des tâches cochées non-récurrentes
+   - Récurrence par jours de la semaine
+     → tâche récurrente cochée : réapparaît le prochain jour prévu
+     → suppression récurrente : popup → "aujourd'hui seulement" OU "pour toujours"
 =========================== */
 
-// âââ STATE âââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── STATE ───────────────────────────────────────────────
 let tasks = [];
 let currentFilter = 'all';
 let editingId = null;
@@ -17,11 +17,11 @@ let recurrenceActive = false;
 let selectedDays = []; // [0..6] dimanche=0, lundi=1, ...
 let pendingDeleteId = null; // id en attente dans la popup
 
-// âââ INIT âââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── INIT ─────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadTasks();
-  checkRecurringRespawn();   // rÃ©apparition des tÃ¢ches rÃ©currentes
-  checkMidnightCleanup();    // suppression des cochÃ©es de la veille
+  checkRecurringRespawn();   // réapparition des tâches récurrentes
+  checkMidnightCleanup();    // suppression des cochées de la veille
   renderAll();
   updateHeaderDate();
   scheduleAutoCleanup();
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// âââ STORAGE ââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── STORAGE ──────────────────────────────────────────────
 function loadTasks() {
   try {
     const raw = localStorage.getItem('todo_tasks_v3');
@@ -44,7 +44,7 @@ function saveTasks() {
   localStorage.setItem('todo_tasks_v3', JSON.stringify(tasks));
 }
 
-// âââ CRUD âââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── CRUD ─────────────────────────────────────────────────
 function addTask(title, desc, prio, recurDays) {
   const task = {
     id: Date.now().toString(),
@@ -54,9 +54,9 @@ function addTask(title, desc, prio, recurDays) {
     done: false,
     createdAt: Date.now(),
     doneAt: null,
-    // RÃ©currence
+    // Récurrence
     recurDays: recurDays || [],        // ex: [1,3,5] pour lun/mer/ven
-    lastRespawnDate: null,             // date ISO du dernier respawn (Ã©vite les doublons)
+    lastRespawnDate: null,             // date ISO du dernier respawn (évite les doublons)
   };
   tasks.unshift(task);
   saveTasks();
@@ -70,7 +70,7 @@ function updateTask(id, title, desc, prio, recurDays) {
   task.desc = desc.trim();
   task.prio = prio || task.prio;
   task.recurDays = recurDays || [];
-  // Si on a retirÃ© tous les jours, on dÃ©sactive la rÃ©currence
+  // Si on a retiré tous les jours, on désactive la récurrence
   if (task.recurDays.length === 0) task.lastRespawnDate = null;
   saveTasks();
 }
@@ -82,10 +82,10 @@ function toggleTask(id) {
   task.doneAt = task.done ? Date.now() : null;
   saveTasks();
   renderAll();
-  if (task.done) showToast('TÃ¢che marquÃ©e comme faite â');
+  if (task.done) showToast('Tâche marquée comme faite ✓');
 }
 
-// Demande confirmation si rÃ©currente
+// Demande confirmation si récurrente
 function requestDelete(id) {
   const task = tasks.find(t => t.id === id);
   if (!task) return;
@@ -113,28 +113,28 @@ function confirmDelete(id) {
     saveTasks();
     renderAll();
   }
-  showToast('TÃ¢che supprimÃ©e');
+  showToast('Tâche supprimée');
 }
 
-// Popup : supprimer seulement aujourd'hui (la tÃ¢che reviendra)
+// Popup : supprimer seulement aujourd'hui (la tâche reviendra)
 function deleteOccurrenceOnly() {
   if (!pendingDeleteId) return;
   const task = tasks.find(t => t.id === pendingDeleteId);
   if (task) {
-    // On marque comme cochÃ©e aujourd'hui â le cleanup de minuit la supprimera
-    // mais le respawn la recrÃ©e au prochain jour prÃ©vu
+    // On marque comme cochée aujourd'hui — le cleanup de minuit la supprimera
+    // mais le respawn la recrée au prochain jour prévu
     task.done = true;
     task.doneAt = Date.now();
-    // On enregistre la date d'aujourd'hui pour Ã©viter double respawn
+    // On enregistre la date d'aujourd'hui pour éviter double respawn
     task.lastRespawnDate = todayISO();
     saveTasks();
     renderAll();
-    showToast('Elle reviendra le prochain jour prÃ©vu ð');
+    showToast('Elle reviendra le prochain jour prévu 🔁');
   }
   closeDeletePopup();
 }
 
-// Popup : supprimer pour toujours (rÃ©currence incluse)
+// Popup : supprimer pour toujours (récurrence incluse)
 function deleteForever() {
   if (!pendingDeleteId) return;
   confirmDelete(pendingDeleteId);
@@ -146,8 +146,8 @@ function closeDeletePopup() {
   pendingDeleteId = null;
 }
 
-// âââ RÃCURRENCE : RESPAWN âââââââââââââââââââââââââââââââââ
-// AppelÃ© au dÃ©marrage + Ã  chaque nouveau jour
+// ─── RÉCURRENCE : RESPAWN ─────────────────────────────────
+// Appelé au démarrage + à chaque nouveau jour
 function checkRecurringRespawn() {
   const today = new Date();
   const todayDay = today.getDay(); // 0=dim, 1=lun, ...
@@ -155,11 +155,11 @@ function checkRecurringRespawn() {
 
   tasks.forEach(task => {
     if (!task.recurDays || task.recurDays.length === 0) return;
-    // DÃ©jÃ  respawnÃ© aujourd'hui ?
+    // Déjà respawné aujourd'hui ?
     if (task.lastRespawnDate === iso) return;
-    // Aujourd'hui est-il un jour prÃ©vu ?
+    // Aujourd'hui est-il un jour prévu ?
     if (task.recurDays.includes(todayDay)) {
-      // RÃ©initialise la tÃ¢che pour aujourd'hui
+      // Réinitialise la tâche pour aujourd'hui
       task.done = false;
       task.doneAt = null;
       task.lastRespawnDate = iso;
@@ -169,7 +169,7 @@ function checkRecurringRespawn() {
   saveTasks();
 }
 
-// âââ AUTO CLEANUP (minuit) âââââââââââââââââââââââââââââââââ
+// ─── AUTO CLEANUP (minuit) ─────────────────────────────────
 function checkMidnightCleanup() {
   const lastClean = localStorage.getItem('todo_last_cleanup_v2');
   const today = new Date().toDateString();
@@ -178,9 +178,9 @@ function checkMidnightCleanup() {
   const before = tasks.length;
   tasks = tasks.filter(t => {
     if (!t.done) return true;
-    // TÃ¢che rÃ©currente cochÃ©e â on la garde (elle sera respawn au bon jour)
+    // Tâche récurrente cochée → on la garde (elle sera respawn au bon jour)
     if (t.recurDays && t.recurDays.length > 0) return true;
-    // TÃ¢che normale cochÃ©e avant aujourd'hui â supprimÃ©e
+    // Tâche normale cochée avant aujourd'hui → supprimée
     const doneDate = new Date(t.doneAt || 0).toDateString();
     return doneDate === today;
   });
@@ -202,7 +202,7 @@ function scheduleAutoCleanup() {
 }
 
 function doMidnightCleanup() {
-  // 1. Supprimer les tÃ¢ches cochÃ©es non-rÃ©currentes
+  // 1. Supprimer les tâches cochées non-récurrentes
   const before = tasks.length;
   tasks = tasks.filter(t => {
     if (!t.done) return true;
@@ -211,16 +211,16 @@ function doMidnightCleanup() {
   });
   const removed = before - tasks.length;
 
-  // 2. Respawn des tÃ¢ches rÃ©currentes pour le nouveau jour
+  // 2. Respawn des tâches récurrentes pour le nouveau jour
   checkRecurringRespawn();
 
   saveTasks();
   renderAll();
-  if (removed > 0) showToast(`${removed} tÃ¢che(s) supprimÃ©es ð`);
+  if (removed > 0) showToast(`${removed} tâche(s) supprimées 🌙`);
   localStorage.setItem('todo_last_cleanup_v2', new Date().toDateString());
 }
 
-// âââ RENDER âââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── RENDER ───────────────────────────────────────────────
 function renderAll() {
   renderTasks();
   renderStats();
@@ -264,7 +264,7 @@ function createTaskEl(task) {
     : '';
 
   const recurBadge = isRecurring
-    ? `<span class="recur-badge">ð ${formatRecurDays(task.recurDays)}</span>`
+    ? `<span class="recur-badge">🔁 ${formatRecurDays(task.recurDays)}</span>`
     : '';
 
   li.innerHTML = `
@@ -309,7 +309,7 @@ function renderStats() {
   document.getElementById('stat-pending').textContent = pending;
 }
 
-// âââ WIDGET âââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── WIDGET ───────────────────────────────────────────────
 function renderWidget() {
   const list = document.getElementById('widget-list');
   const count = document.getElementById('widget-count');
@@ -346,13 +346,13 @@ function switchView(view) {
   }
 }
 
-// âââ MODAL ââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── MODAL ────────────────────────────────────────────────
 function openModal() {
   editingId = null;
   selectedPrio = 'normal';
   recurrenceActive = false;
   selectedDays = [];
-  document.getElementById('modal-title').textContent = 'Nouvelle tÃ¢che';
+  document.getElementById('modal-title').textContent = 'Nouvelle tâche';
   document.getElementById('btn-save').textContent = 'Ajouter';
   document.getElementById('input-title').value = '';
   document.getElementById('input-desc').value = '';
@@ -371,7 +371,7 @@ function openEditModal(id) {
   selectedDays = [...(task.recurDays || [])];
   recurrenceActive = selectedDays.length > 0;
 
-  document.getElementById('modal-title').textContent = 'Modifier la tÃ¢che';
+  document.getElementById('modal-title').textContent = 'Modifier la tâche';
   document.getElementById('btn-save').textContent = 'Enregistrer';
   document.getElementById('input-title').value = task.title;
   document.getElementById('input-desc').value = task.desc;
@@ -381,7 +381,7 @@ function openEditModal(id) {
   if (recurrenceActive) {
     const btn = document.getElementById('toggle-recurrence');
     btn.classList.add('active');
-    document.getElementById('recurrence-toggle-label').textContent = 'ActivÃ©e';
+    document.getElementById('recurrence-toggle-label').textContent = 'Activée';
     document.getElementById('recurrence-panel').classList.remove('hidden');
     // Cocher les bons jours
     document.querySelectorAll('.day-btn').forEach(b => {
@@ -419,17 +419,17 @@ function saveTask() {
 
   if (editingId) {
     updateTask(editingId, title, desc, selectedPrio, recurDays);
-    showToast('TÃ¢che modifiÃ©e â');
+    showToast('Tâche modifiée ✓');
   } else {
     addTask(title, desc, selectedPrio, recurDays);
-    showToast(recurDays.length > 0 ? 'TÃ¢che rÃ©currente ajoutÃ©e ð' : 'TÃ¢che ajoutÃ©e â');
+    showToast(recurDays.length > 0 ? 'Tâche récurrente ajoutée 🔁' : 'Tâche ajoutée ✓');
   }
 
   closeModal();
   renderAll();
 }
 
-// âââ RÃCURRENCE UI ââââââââââââââââââââââââââââââââââââââââ
+// ─── RÉCURRENCE UI ────────────────────────────────────────
 function toggleRecurrence() {
   recurrenceActive = !recurrenceActive;
   const btn = document.getElementById('toggle-recurrence');
@@ -437,7 +437,7 @@ function toggleRecurrence() {
   const label = document.getElementById('recurrence-toggle-label');
 
   btn.classList.toggle('active', recurrenceActive);
-  label.textContent = recurrenceActive ? 'ActivÃ©e' : 'DÃ©sactivÃ©e';
+  label.textContent = recurrenceActive ? 'Activée' : 'Désactivée';
   panel.classList.toggle('hidden', !recurrenceActive);
 
   if (!recurrenceActive) {
@@ -475,12 +475,12 @@ function resetRecurrenceUI() {
   selectedDays = [];
   const btn = document.getElementById('toggle-recurrence');
   btn.classList.remove('active');
-  document.getElementById('recurrence-toggle-label').textContent = 'DÃ©sactivÃ©e';
+  document.getElementById('recurrence-toggle-label').textContent = 'Désactivée';
   document.getElementById('recurrence-panel').classList.add('hidden');
   document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
 }
 
-// âââ PRIORITY âââââââââââââââââââââââââââââââââââââââââââââ
+// ─── PRIORITY ─────────────────────────────────────────────
 function selectPrio(prio, btn) {
   selectedPrio = prio;
   updatePrioButtons(prio);
@@ -492,7 +492,7 @@ function updatePrioButtons(prio) {
   });
 }
 
-// âââ FILTER âââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── FILTER ───────────────────────────────────────────────
 function setFilter(filter, btn) {
   currentFilter = filter;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -500,7 +500,7 @@ function setFilter(filter, btn) {
   renderTasks();
 }
 
-// âââ UTILS ââââââââââââââââââââââââââââââââââââââââââââââââ
+// ─── UTILS ────────────────────────────────────────────────
 function todayISO() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -518,7 +518,7 @@ function formatRecurDays(days) {
   const names = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
   // Trier par jour de semaine
   const sorted = [...days].sort((a,b) => a-b);
-  if (sorted.join(',') === '1,2,3,4,5') return 'LunâVen';
+  if (sorted.join(',') === '1,2,3,4,5') return 'Lun–Ven';
   if (sorted.join(',') === '0,6') return 'Week-end';
   return sorted.map(d => names[d]).join(', ');
 }
@@ -526,7 +526,7 @@ function formatRecurDays(days) {
 function updateHeaderDate() {
   const d = new Date();
   const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-  const months = ['Jan','FÃ©v','Mar','Avr','Mai','Juin','Juil','AoÃ»t','Sep','Oct','Nov','DÃ©c'];
+  const months = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
   document.getElementById('header-date').textContent =
     `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
 }
